@@ -1,0 +1,13 @@
+<svg width="180" height="48" viewBox="0 0 180 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Cloche (food cover) -->
+  <ellipse cx="22" cy="32" rx="18" ry="4" fill="#e8231a"/>
+  <path d="M6 32 Q6 16 22 14 Q38 16 38 32Z" fill="#e8231a"/>
+  <ellipse cx="22" cy="32" rx="18" ry="3.5" fill="#c0110e"/>
+  <!-- Handle -->
+  <circle cx="22" cy="13" r="3" fill="#ff8c00"/>
+  <!-- Location pin overlay -->
+  <path d="M34 8 C34 4.686 36.686 2 40 2 C43.314 2 46 4.686 46 8 C46 12.5 40 18 40 18 C40 18 34 12.5 34 8Z" fill="#e8231a" stroke="white" stroke-width="1.2"/>
+  <circle cx="40" cy="8" r="2.5" fill="white"/>
+  <!-- Brand text -->
+  <text x="52" y="32" font-family="system-ui, -apple-system, sans-serif" font-size="22" font-weight="800" fill="#e8231a" letter-spacing="-0.5">Sipari<tspan fill="#ff8c00">m</tspan></text>
+</svg>
