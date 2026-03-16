@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 160" width="480" height="160">
+  <defs>
+    <radialGradient id="clocheGradL" cx="50%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#ff6b3d"/>
+      <stop offset="60%" stop-color="#e8231a"/>
+      <stop offset="100%" stop-color="#b01010"/>
+    </radialGradient>
+    <linearGradient id="speedGradL" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ff8c00" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#ff8c00" stop-opacity="0.85"/>
+    </linearGradient>
+    <filter id="shadowL" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#c0220a" flood-opacity="0.3"/>
+    </filter>
+    <filter id="glowL">
+      <feGaussianBlur stdDeviation="1.5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Hız çizgileri -->
+  <line x1="18" y1="72" x2="88" y2="72" stroke="url(#speedGradL)" stroke-width="4.5" stroke-linecap="round" opacity="0.9"/>
+  <line x1="8"  y1="83" x2="82" y2="83" stroke="url(#speedGradL)" stroke-width="3.5" stroke-linecap="round" opacity="0.75"/>
+  <line x1="22" y1="94" x2="86" y2="94" stroke="url(#speedGradL)" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
+
+  <!-- Cloche base -->
+  <rect x="62" y="103" width="88" height="9" rx="4.5" fill="#c0110e" filter="url(#shadowL)"/>
+  <ellipse cx="106" cy="103" rx="44" ry="5" fill="#a00e0b" opacity="0.5"/>
+  <!-- Cloche dome -->
+  <path d="M 62 103 Q 62 58 106 58 Q 150 58 150 103 Z"
+        fill="url(#clocheGradL)" filter="url(#shadowL)"/>
+  <!-- Highlight -->
+  <path d="M 78 85 Q 80 65 106 62 Q 92 63 82 78 Z" fill="white" opacity="0.2"/>
+
+  <!-- Konum pini (kırmızı+beyaz - açık bg için) -->
+  <g transform="translate(106, 36)" filter="url(#glowL)">
+    <path d="M 0 -18 C -10 -18 -10 -5 0 0 C 10 -5 10 -18 0 -18 Z" fill="#e8231a"/>
+    <circle cx="0" cy="-12" r="4" fill="white"/>
+    <path d="M -4 -3 Q 0 6 4 -3 Z" fill="#e8231a"/>
+  </g>
+
+  <!-- "Siparim" - koyu renk (açık bg için) -->
+  <text x="165" y="98"
+        font-family="'Arial Black', 'Impact', sans-serif"
+        font-size="52"
+        font-weight="900"
+        font-style="italic"
+        fill="#1a1a1a"
+        filter="url(#shadowL)"
+        letter-spacing="-1">Siparim</text>
+
+  <!-- Turuncu noktalar -->
+  <circle cx="212" cy="52" r="5" fill="#ff8c00"/>
+  <circle cx="284" cy="52" r="5" fill="#ff8c00"/>
+
+  <!-- Slogan -->
+  <text x="169" y="122"
+        font-family="'Arial', sans-serif"
+        font-size="18"
+        font-weight="600"
+        font-style="italic"
+        fill="#ff8c00"
+        letter-spacing="0.5">Yemeğin Kapinda</text>
+</svg>
