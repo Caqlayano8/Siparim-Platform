@@ -1,5 +1,5 @@
+﻿// (c) C.Kurtoglu - Siparim Platform - Bu dosya Caglayan KURTOGLU tarafindan yapilmistir. Yetkisiz kopyalama yasaktir.
 import Link from 'next/link';
-import Image from 'next/image';
 
 export default function Footer() {
   return (
@@ -9,7 +9,7 @@ export default function Footer() {
           {/* Brand */}
           <div className="md:col-span-1">
             <div className="flex items-center gap-2 mb-3">
-              <Image src="/logo.svg" alt="Siparim" width={100} height={28} className="brightness-0 invert" />
+              <img src="/logo.svg" alt="Siparim" width={100} height={28} className="brightness-0 invert" />
             </div>
             <p className="text-sm text-gray-500 leading-relaxed">
               Türkiye&apos;nin en hızlı yemek teslimat platformu. Binlerce restoran, kapında.
@@ -64,7 +64,7 @@ export default function Footer() {
                 ['Restoran Ol', '/register?role=restaurant'],
                 ['Kurye Ol', '/register?role=courier'],
                 ['İletişim', '/contact'],
-                ['KVKK', '/privacy'],
+                ['KVKK', '/kvkk'],
               ].map(([label, href]) => (
                 <li key={label}>
                   <Link href={href} className="hover:text-white transition-colors">{label}</Link>

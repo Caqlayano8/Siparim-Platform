@@ -22,8 +22,12 @@ export class AdminService {
     return this.restaurantsService.approve(id);
   }
 
-  async rejectRestaurant(id: string) {
+  async rejectRestaurant(id: string, reason?: string) {
     return this.restaurantsService.reject(id);
+  }
+
+  async toggleRestaurant(id: string, isOpen: boolean) {
+    return this.restaurantsService.adminSetOpen(id, isOpen);
   }
 
   async suspendRestaurant(id: string) {
@@ -55,8 +59,16 @@ export class AdminService {
     return this.usersService.deactivate(id);
   }
 
-  async getAllRestaurants() {
-    return this.restaurantsService.findAll(false);
+  async getAllRestaurants(status?: string) {
+    const all = await this.restaurantsService.findAll(false);
+    if (status) return all.filter((r) => r.status === status);
+    return all;
+  }
+
+  async getAllOrders(params?: { status?: string; page?: number }) {
+    const all = await this.ordersService.findAll();
+    if (params?.status) return all.filter((o) => o.status === params.status);
+    return all;
   }
 
   async getAllCouriers() {

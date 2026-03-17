@@ -3,9 +3,12 @@ import {
   Get,
   Put,
   Param,
+  Body,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { AdminService } from './admin.service';
+import { SettingsService } from './settings.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
@@ -14,7 +17,10 @@ import { Roles } from '../auth/roles.decorator';
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles('admin')
 export class AdminController {
-  constructor(private readonly adminService: AdminService) {}
+  constructor(
+    private readonly adminService: AdminService,
+    private readonly settingsService: SettingsService,
+  ) {}
 
   @Get('stats')
   getStats() {
@@ -32,8 +38,8 @@ export class AdminController {
   }
 
   @Get('restaurants')
-  getAllRestaurants() {
-    return this.adminService.getAllRestaurants();
+  getAllRestaurants(@Query('status') status?: string) {
+    return this.adminService.getAllRestaurants(status);
   }
 
   @Get('restaurants/pending')
@@ -47,8 +53,13 @@ export class AdminController {
   }
 
   @Put('restaurants/:id/reject')
-  rejectRestaurant(@Param('id') id: string) {
-    return this.adminService.rejectRestaurant(id);
+  rejectRestaurant(@Param('id') id: string, @Body() body: { reason?: string }) {
+    return this.adminService.rejectRestaurant(id, body?.reason);
+  }
+
+  @Put('restaurants/:id/toggle')
+  adminToggleRestaurant(@Param('id') id: string, @Body() body: { isOpen: boolean }) {
+    return this.adminService.toggleRestaurant(id, body.isOpen);
   }
 
   @Put('restaurants/:id/suspend')
@@ -79,5 +90,20 @@ export class AdminController {
   @Put('couriers/:id/suspend')
   suspendCourier(@Param('id') id: string) {
     return this.adminService.suspendCourier(id);
+  }
+
+  @Get('orders')
+  getAllOrders(@Query('status') status?: string, @Query('page') page?: string) {
+    return this.adminService.getAllOrders({ status, page: page ? parseInt(page) : 1 });
+  }
+
+  @Get('settings')
+  getSettings() {
+    return this.settingsService.getSettings();
+  }
+
+  @Put('settings')
+  updateSettings(@Body() body: Record<string, any>) {
+    return this.settingsService.updateSettings(body);
   }
 }

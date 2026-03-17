@@ -1,3 +1,4 @@
+﻿// (c) C.Kurtoglu - Siparim Platform - Bu dosya Caglayan KURTOGLU tarafindan yapilmistir. Yetkisiz kopyalama yasaktir.
 'use client';
 
 import { useState } from 'react';
@@ -8,8 +9,11 @@ import { useAuthStore } from '@/store/authStore';
 const NAV_ITEMS = [
   { href: '/admin', label: 'Dashboard', icon: '📊', exact: true },
   { href: '/admin/restaurants', label: 'Restoranlar', icon: '🏪' },
+  { href: '/admin/orders', label: 'Siparişler', icon: '📦' },
   { href: '/admin/couriers', label: 'Kuryeler', icon: '🛵' },
-  { href: '/admin/orders', label: 'Siparişler', icon: '🛒' },
+  { href: '/admin/users', label: 'Kullanıcılar', icon: '👥' },
+  { href: '/admin/payment-settings', label: 'Ödeme Ayarları', icon: '💳' },
+  { href: '/admin/settings', label: 'Sistem Ayarları', icon: '⚙️' },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

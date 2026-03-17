@@ -75,6 +75,12 @@ export class RestaurantsService {
     return this.restaurantRepo.save(restaurant);
   }
 
+  async adminSetOpen(id: string, isOpen: boolean): Promise<Restaurant> {
+    const restaurant = await this.findById(id);
+    restaurant.isOpen = isOpen;
+    return this.restaurantRepo.save(restaurant);
+  }
+
   async findByCategory(category: string): Promise<Restaurant[]> {
     return this.restaurantRepo.find({ where: { category, status: 'approved' } });
   }

@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import { User } from './user.entity';
 import { Address } from './address.entity';
 import { UpdateUserDto, CreateAddressDto } from './dto/update-user.dto';
@@ -21,6 +21,13 @@ export class UsersService {
 
   async findByEmail(email: string): Promise<User> {
     return this.userRepo.findOne({ where: { email } });
+  }
+
+  async findByEmailOrUsername(identifier: string): Promise<User> {
+    if (identifier.includes('@')) {
+      return this.userRepo.findOne({ where: { email: ILike(identifier) } });
+    }
+    return this.userRepo.findOne({ where: { firstName: ILike(identifier) } });
   }
 
   async create(data: Partial<User>): Promise<User> {

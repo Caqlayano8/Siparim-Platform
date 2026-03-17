@@ -13,6 +13,8 @@ import { CouriersModule } from './couriers/couriers.module';
 import { PaymentsModule } from './payments/payments.module';
 import { AdminModule } from './admin/admin.module';
 import { AppGatewayModule } from './gateway/app.gateway.module';
+import { LicenseModule } from './license/license.module';
+import { NotificationsModule } from './notifications/notifications.module';
 import { User } from './users/user.entity';
 import { Address } from './users/address.entity';
 import { Restaurant } from './restaurants/restaurant.entity';
@@ -59,6 +61,8 @@ import { Payment } from './payments/payment.entity';
     PaymentsModule,
     AdminModule,
     AppGatewayModule,
+    LicenseModule,
+    NotificationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

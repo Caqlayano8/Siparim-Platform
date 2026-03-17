@@ -1,45 +1,77 @@
+﻿// (c) C.Kurtoglu - Siparim Platform - Bu dosya Caglayan KURTOGLU tarafindan yapilmistir. Yetkisiz kopyalama yasaktir.
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-
-const STATS = [
-  { label: 'Toplam Restoran', value: '1.247', icon: '🏪', color: 'text-blue-600', bg: 'bg-blue-50', href: '/admin/restaurants' },
-  { label: 'Toplam Kurye', value: '384', icon: '🛵', color: 'text-green-600', bg: 'bg-green-50', href: '/admin/couriers' },
-  { label: 'Bugünün Siparişleri', value: '3.842', icon: '🛒', color: 'text-orange-600', bg: 'bg-orange-50', href: '/admin/orders' },
-  { label: 'Bugünün Geliri', value: '₺428.940', icon: '💰', color: 'text-primary', bg: 'bg-primary-light', href: '/admin/orders' },
-  { label: 'Onay Bekleyen Restoran', value: '12', icon: '⏳', color: 'text-yellow-600', bg: 'bg-yellow-50', href: '/admin/restaurants' },
-  { label: 'Aktif Siparişler', value: '247', icon: '🔥', color: 'text-red-600', bg: 'bg-red-50', href: '/admin/orders' },
-];
-
-const RECENT_ORDERS = [
-  { id: 'o1', number: '#4821', customer: 'Ahmet Y.', restaurant: 'Burger King', total: 189.90, status: 'on_way' },
-  { id: 'o2', number: '#4820', customer: 'Fatma K.', restaurant: 'Pizza Hut', total: 249.00, status: 'preparing' },
-  { id: 'o3', number: '#4819', customer: 'Mehmet A.', restaurant: 'Dönerci Ahmet', total: 94.50, status: 'delivered' },
-  { id: 'o4', number: '#4818', customer: 'Zeynep B.', restaurant: 'Sushi Palace', total: 380.00, status: 'delivered' },
-  { id: 'o5', number: '#4817', customer: 'Ali R.', restaurant: 'Kahve Dünyası', total: 67.80, status: 'cancelled' },
-];
+import { adminApi } from '@/lib/api';
+import toast from 'react-hot-toast';
 
 const STATUS_COLORS: Record<string, string> = {
   pending: 'bg-yellow-100 text-yellow-700',
-  accepted: 'bg-blue-100 text-blue-700',
+  restaurant_accepted: 'bg-blue-100 text-blue-700',
   preparing: 'bg-orange-100 text-orange-700',
   ready: 'bg-purple-100 text-purple-700',
-  on_way: 'bg-indigo-100 text-indigo-700',
+  courier_assigned: 'bg-indigo-100 text-indigo-700',
+  picked_up: 'bg-indigo-100 text-indigo-700',
   delivered: 'bg-green-100 text-green-700',
   cancelled: 'bg-red-100 text-red-600',
 };
 
 const STATUS_LABELS: Record<string, string> = {
   pending: '⏳ Bekliyor',
-  accepted: '✅ Onaylandı',
+  restaurant_accepted: '✅ Onaylandı',
   preparing: '👨‍🍳 Hazırlanıyor',
   ready: '🎉 Hazır',
-  on_way: '🛵 Yolda',
+  courier_assigned: '🛵 Kurye Atandı',
+  picked_up: '🛵 Yolda',
   delivered: '🏠 Teslim Edildi',
   cancelled: '❌ İptal',
 };
 
 export default function AdminDashboard() {
+  const [stats, setStats] = useState<any>(null);
+  const [recentOrders, setRecentOrders] = useState<any[]>([]);
+  const [courierEnabled, setCourierEnabled] = useState(true);
+  const [savingCourier, setSavingCourier] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const stored = localStorage.getItem('courier_service_enabled');
+    if (stored !== null) setCourierEnabled(stored === 'true');
+
+    Promise.all([
+      adminApi.getStats().catch(() => null),
+      adminApi.getAllOrders({ page: 1 }).catch(() => null),
+    ]).then(([statsRes, ordersRes]) => {
+      if (statsRes?.data) setStats(statsRes.data);
+      if (ordersRes?.data) setRecentOrders(Array.isArray(ordersRes.data) ? ordersRes.data.slice(0, 5) : []);
+    }).finally(() => setLoading(false));
+  }, []);
+
+  const handleCourierToggle = async () => {
+    setSavingCourier(true);
+    try {
+      const newVal = !courierEnabled;
+      await adminApi.updateSettings({ courierServiceEnabled: newVal });
+      localStorage.setItem('courier_service_enabled', String(newVal));
+      setCourierEnabled(newVal);
+      toast.success(newVal ? 'Kurye servisi aktif edildi' : 'Kurye servisi durduruldu');
+    } catch {
+      toast.error('Ayar kaydedilemedi');
+    } finally {
+      setSavingCourier(false);
+    }
+  };
+
+  const statCards = stats ? [
+    { label: 'Toplam Restoran', value: stats.restaurants?.total ?? 0, icon: '🏪', color: 'text-blue-600', bg: 'bg-blue-50', href: '/admin/restaurants' },
+    { label: 'Toplam Kurye', value: stats.couriers?.total ?? 0, icon: '🛵', color: 'text-green-600', bg: 'bg-green-50', href: '/admin/couriers' },
+    { label: 'Toplam Sipariş', value: stats.orders?.total ?? 0, icon: '📦', color: 'text-orange-600', bg: 'bg-orange-50', href: '/admin/orders' },
+    { label: 'Toplam Kullanıcı', value: stats.users?.total ?? 0, icon: '👥', color: 'text-primary', bg: 'bg-primary-light', href: '/admin/users' },
+    { label: 'Onay Bekleyen Restoran', value: stats.restaurants?.pending ?? 0, icon: '⏳', color: 'text-yellow-600', bg: 'bg-yellow-50', href: '/admin/restaurants' },
+    { label: 'Onay Bekleyen Kurye', value: stats.couriers?.pending ?? 0, icon: '🔔', color: 'text-red-600', bg: 'bg-red-50', href: '/admin/couriers' },
+  ] : [];
+
   return (
     <div className="space-y-6">
       <div>
@@ -49,67 +81,41 @@ export default function AdminDashboard() {
         </p>
       </div>
 
+      {/* Courier Service Toggle */}
+      <div className={`rounded-2xl p-5 shadow-sm flex items-center justify-between ${courierEnabled ? 'bg-white' : 'bg-yellow-50 border-2 border-yellow-300'}`}>
+        <div>
+          <h3 className="font-bold text-gray-800 text-lg">🛵 Kurye Servisi</h3>
+          <p className={`text-sm mt-0.5 ${courierEnabled ? 'text-green-600' : 'text-yellow-700 font-semibold'}`}>
+            {courierEnabled ? '✅ Kurye servisi aktif - Siparişler alınıyor' : '⚠️ Kurye servisi devre dışı - Siparişler alınamaz'}
+          </p>
+        </div>
+        <button
+          onClick={handleCourierToggle}
+          disabled={savingCourier}
+          className={`relative w-16 h-8 rounded-full transition-colors duration-300 disabled:opacity-60 ${courierEnabled ? 'bg-green-500' : 'bg-gray-300'}`}
+        >
+          <span className={`absolute top-1 left-1 w-6 h-6 bg-white rounded-full shadow transition-transform duration-300 ${courierEnabled ? 'translate-x-8' : 'translate-x-0'}`} />
+        </button>
+      </div>
+
       {/* Stat cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-        {STATS.map((stat) => (
-          <Link
-            key={stat.label}
-            href={stat.href}
-            className="bg-white rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow block"
-          >
-            <div className={`inline-flex items-center justify-center w-12 h-12 rounded-xl ${stat.bg} text-2xl mb-3`}>
-              {stat.icon}
-            </div>
-            <p className={`text-2xl font-black ${stat.color}`}>{stat.value}</p>
-            <p className="text-xs text-gray-400 mt-1">{stat.label}</p>
-          </Link>
-        ))}
-      </div>
-
-      {/* Two column layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-        {/* Platform revenue chart */}
-        <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm p-5">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-bold text-gray-800">Platform Geliri (Bu Hafta)</h3>
-            <span className="badge bg-green-100 text-green-700 text-xs">↑ 8.3% bu hafta</span>
-          </div>
-          <div className="h-44 flex items-end gap-3 px-2">
-            {[38400, 52100, 41200, 68900, 57300, 72400, 72000].map((val, i) => {
-              const days = ['Pt', 'Sa', 'Ça', 'Pe', 'Cu', 'Ct', 'Pa'];
-              const max = 72400;
-              return (
-                <div key={i} className="flex-1 flex flex-col items-center gap-1">
-                  <div
-                    className="w-full rounded-t-lg bg-gradient-to-t from-primary/30 to-primary hover:opacity-80 transition-opacity cursor-pointer"
-                    style={{ height: `${(val / max) * 160}px` }}
-                    title={`₺${val.toLocaleString('tr-TR')}`}
-                  />
-                  <span className="text-[10px] text-gray-400">{days[i]}</span>
-                </div>
-              );
-            })}
-          </div>
+      {loading ? (
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+          {[...Array(6)].map((_, i) => <div key={i} className="bg-white rounded-2xl p-5 shadow-sm h-28 animate-pulse" />)}
         </div>
-
-        {/* Quick stats */}
-        <div className="bg-white rounded-2xl shadow-sm p-5">
-          <h3 className="font-bold text-gray-800 mb-4">Hızlı Özet</h3>
-          <div className="space-y-3">
-            {[
-              { label: 'Onay Bekleyen Restoran', value: 12, color: 'text-yellow-600', href: '/admin/restaurants' },
-              { label: 'Onay Bekleyen Kurye', value: 7, color: 'text-blue-600', href: '/admin/couriers' },
-              { label: 'Aktif Sipariş', value: 247, color: 'text-orange-600', href: '/admin/orders' },
-              { label: 'Bu Ay Yeni Üye', value: 1243, color: 'text-green-600', href: '#' },
-            ].map((item) => (
-              <Link key={item.label} href={item.href} className="flex items-center justify-between p-3 rounded-xl hover:bg-gray-50 transition-colors">
-                <span className="text-sm text-gray-600">{item.label}</span>
-                <span className={`font-bold text-lg ${item.color}`}>{item.value}</span>
-              </Link>
-            ))}
-          </div>
+      ) : (
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+          {statCards.map((stat) => (
+            <Link key={stat.label} href={stat.href} className="bg-white rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow block">
+              <div className={`inline-flex items-center justify-center w-12 h-12 rounded-xl ${stat.bg} text-2xl mb-3`}>
+                {stat.icon}
+              </div>
+              <p className={`text-2xl font-black ${stat.color}`}>{stat.value.toLocaleString('tr-TR')}</p>
+              <p className="text-xs text-gray-400 mt-1">{stat.label}</p>
+            </Link>
+          ))}
         </div>
-      </div>
+      )}
 
       {/* Recent orders table */}
       <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
@@ -117,34 +123,38 @@ export default function AdminDashboard() {
           <h3 className="font-bold text-gray-800">Son Siparişler</h3>
           <Link href="/admin/orders" className="text-sm text-primary hover:underline">Tümünü Gör</Link>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="bg-gray-50 border-b border-gray-100">
-                <th className="text-left px-5 py-3 font-semibold text-gray-500">Sipariş</th>
-                <th className="text-left px-4 py-3 font-semibold text-gray-500">Müşteri</th>
-                <th className="text-left px-4 py-3 font-semibold text-gray-500">Restoran</th>
-                <th className="text-left px-4 py-3 font-semibold text-gray-500">Tutar</th>
-                <th className="text-left px-4 py-3 font-semibold text-gray-500">Durum</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-50">
-              {RECENT_ORDERS.map((order) => (
-                <tr key={order.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-5 py-3.5 font-semibold text-gray-800">{order.number}</td>
-                  <td className="px-4 py-3.5 text-gray-600">{order.customer}</td>
-                  <td className="px-4 py-3.5 text-gray-600">{order.restaurant}</td>
-                  <td className="px-4 py-3.5 font-bold text-primary">{order.total.toFixed(2)} ₺</td>
-                  <td className="px-4 py-3.5">
-                    <span className={`badge text-xs ${STATUS_COLORS[order.status]}`}>
-                      {STATUS_LABELS[order.status]}
-                    </span>
-                  </td>
+        {recentOrders.length === 0 && !loading ? (
+          <div className="text-center py-10 text-gray-400"><span className="text-3xl">📦</span><p className="mt-2 text-sm">Henüz sipariş yok.</p></div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-gray-50 border-b border-gray-100">
+                  <th className="text-left px-5 py-3 font-semibold text-gray-500">Sipariş</th>
+                  <th className="text-left px-4 py-3 font-semibold text-gray-500">Müşteri</th>
+                  <th className="text-left px-4 py-3 font-semibold text-gray-500">Restoran</th>
+                  <th className="text-left px-4 py-3 font-semibold text-gray-500">Tutar</th>
+                  <th className="text-left px-4 py-3 font-semibold text-gray-500">Durum</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {recentOrders.map((order) => (
+                  <tr key={order.id} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-5 py-3.5 font-semibold text-gray-800">#{order.orderNumber || order.id?.slice(0, 8)}</td>
+                    <td className="px-4 py-3.5 text-gray-600">{order.customer?.firstName ? `${order.customer.firstName} ${order.customer.lastName ?? ''}`.trim() : '—'}</td>
+                    <td className="px-4 py-3.5 text-gray-600">{order.restaurant?.name ?? '—'}</td>
+                    <td className="px-4 py-3.5 font-bold text-primary">{Number(order.totalAmount ?? 0).toFixed(2)} ₺</td>
+                    <td className="px-4 py-3.5">
+                      <span className={`badge text-xs ${STATUS_COLORS[order.status] ?? 'bg-gray-100 text-gray-500'}`}>
+                        {STATUS_LABELS[order.status] ?? order.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );

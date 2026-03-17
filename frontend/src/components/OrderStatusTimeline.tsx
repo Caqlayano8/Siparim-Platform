@@ -1,3 +1,4 @@
+﻿// (c) C.Kurtoglu - Siparim Platform - Bu dosya Caglayan KURTOGLU tarafindan yapilmistir. Yetkisiz kopyalama yasaktir.
 import { OrderStatus, StatusHistory } from '@/types';
 
 const STEPS: { status: OrderStatus; label: string; icon: string; description: string }[] = [

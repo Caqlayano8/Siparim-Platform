@@ -1,3 +1,4 @@
+﻿// (c) C.Kurtoglu - Siparim Platform - Bu dosya Caglayan KURTOGLU tarafindan yapilmistir. Yetkisiz kopyalama yasaktir.
 'use client';
 
 import { useEffect, useRef } from 'react';

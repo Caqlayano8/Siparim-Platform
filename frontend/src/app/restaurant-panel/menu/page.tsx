@@ -1,7 +1,7 @@
+﻿// (c) C.Kurtoglu - Siparim Platform - Bu dosya Caglayan KURTOGLU tarafindan yapilmistir. Yetkisiz kopyalama yasaktir.
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image';
 import toast from 'react-hot-toast';
 import { menuApi } from '@/lib/api';
 import { MenuItem, MenuCategory } from '@/types';
@@ -180,7 +180,7 @@ export default function RestaurantMenuPage() {
                     <div className="flex items-center gap-3">
                       {item.image ? (
                         <div className="relative w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
-                          <Image src={item.image} alt={item.name} fill className="object-cover" />
+                          <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                         </div>
                       ) : (
                         <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center text-gray-400">🍽️</div>

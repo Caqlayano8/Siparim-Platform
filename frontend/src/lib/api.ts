@@ -1,3 +1,4 @@
+﻿// (c) C.Kurtoglu - Siparim Platform - Bu dosya Caglayan KURTOGLU tarafindan yapilmistir. Yetkisiz kopyalama yasaktir.
 import axios from 'axios';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
@@ -47,7 +48,19 @@ export const authApi = {
     password: string;
     phone: string;
     role?: string;
-  }) => api.post('/auth/register', data),
+  }) => {
+    const nameParts = data.name.trim().split(' ');
+    const firstName = nameParts[0] || data.name;
+    const lastName = nameParts.slice(1).join(' ') || '-';
+    return api.post('/auth/register', {
+      firstName,
+      lastName,
+      email: data.email,
+      password: data.password,
+      phone: data.phone,
+      role: data.role,
+    });
+  },
   me: () => api.get('/auth/me'),
   logout: () => api.post('/auth/logout'),
 };
@@ -106,13 +119,22 @@ export const profileApi = {
 export const adminApi = {
   getStats: () => api.get('/admin/stats'),
   getPendingRestaurants: () => api.get('/admin/restaurants/pending'),
+  getRestaurants: (params?: { status?: string }) => api.get('/admin/restaurants', { params }),
   approveRestaurant: (id: string) => api.put(`/admin/restaurants/${id}/approve`),
-  rejectRestaurant: (id: string, reason: string) =>
+  rejectRestaurant: (id: string, reason?: string) =>
     api.put(`/admin/restaurants/${id}/reject`, { reason }),
+  toggleRestaurant: (id: string, isOpen: boolean) =>
+    api.put(`/admin/restaurants/${id}/toggle`, { isOpen }),
+  suspendRestaurant: (id: string) => api.put(`/admin/restaurants/${id}/suspend`),
+  updateRestaurant: (id: string, data: object) => api.put(`/admin/restaurants/${id}`, data),
   getPendingCouriers: () => api.get('/admin/couriers/pending'),
+  getAllCouriers: () => api.get('/admin/couriers'),
   approveCourier: (id: string) => api.put(`/admin/couriers/${id}/approve`),
   rejectCourier: (id: string) => api.put(`/admin/couriers/${id}/reject`),
   getAllOrders: (params?: object) => api.get('/admin/orders', { params }),
+  getAllUsers: () => api.get('/admin/users'),
+  getSettings: () => api.get('/admin/settings'),
+  updateSettings: (settings: object) => api.put('/admin/settings', settings),
 };
 
 // Earnings

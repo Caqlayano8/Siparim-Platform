@@ -1,3 +1,4 @@
+﻿// (c) C.Kurtoglu - Siparim Platform - Bu dosya Caglayan KURTOGLU tarafindan yapilmistir. Yetkisiz kopyalama yasaktir.
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { User } from '@/types';

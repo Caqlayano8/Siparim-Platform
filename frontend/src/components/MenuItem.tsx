@@ -1,6 +1,7 @@
+﻿// (c) C.Kurtoglu - Siparim Platform - Bu dosya Caglayan KURTOGLU tarafindan yapilmistir. Yetkisiz kopyalama yasaktir.
 'use client';
 
-import Image from 'next/image';
+
 import toast from 'react-hot-toast';
 import { MenuItem as MenuItemType, Restaurant } from '@/types';
 import { useCartStore } from '@/store/cartStore';
@@ -27,7 +28,8 @@ export default function MenuItem({ item, restaurant }: MenuItemProps) {
       {/* Image */}
       {item.image && (
         <div className="relative w-20 h-20 rounded-xl overflow-hidden flex-shrink-0">
-          <Image src={item.image} alt={item.name} fill className="object-cover" />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
         </div>
       )}
 

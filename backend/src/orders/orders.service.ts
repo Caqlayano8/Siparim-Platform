@@ -12,6 +12,8 @@ import { CreateOrderDto } from './dto/create-order.dto';
 import { RestaurantsService } from '../restaurants/restaurants.service';
 import { MenuService } from '../menu/menu.service';
 import { User } from '../users/user.entity';
+import { AppGateway } from '../gateway/app.gateway';
+import { NotificationsService } from '../notifications/notifications.service';
 
 const STATUS_FLOW: Record<OrderStatus, OrderStatus[]> = {
   pending: ['restaurant_accepted', 'cancelled'],
@@ -31,6 +33,8 @@ export class OrdersService {
     @InjectRepository(OrderItem) private orderItemRepo: Repository<OrderItem>,
     private restaurantsService: RestaurantsService,
     private menuService: MenuService,
+    private appGateway: AppGateway,
+    private notificationsService: NotificationsService,
   ) {}
 
   async create(dto: CreateOrderDto, customer: Partial<User>): Promise<Order> {
@@ -78,7 +82,36 @@ export class OrdersService {
       status: 'pending',
     });
 
-    return this.orderRepo.save(order);
+    const savedOrder = await this.orderRepo.save(order);
+
+    const customerName = `${(customer as User).firstName || ''} ${(customer as User).lastName || ''}`.trim() || (customer as User).email || 'Müşteri';
+
+    // Notify restaurant via WebSocket
+    if (restaurant.owner?.id) {
+      this.appGateway.notifyNewOrder(restaurant.owner.id, {
+        id: savedOrder.id,
+        totalAmount: savedOrder.totalAmount,
+        customerName,
+        itemCount: orderItems.length,
+      });
+    }
+
+    // Send admin email + WhatsApp notification
+    const notifyOrder = {
+      id: savedOrder.id,
+      restaurantName: restaurant.name,
+      customerName,
+      totalAmount: savedOrder.totalAmount,
+      deliveryAddress: dto.deliveryAddress || '',
+      items: orderItems.map((item) => ({
+        name: item.menuItem?.name || 'Ürün',
+        quantity: item.quantity,
+      })),
+    };
+    this.notificationsService.sendOrderNotificationEmail(notifyOrder).catch(() => {});
+    this.notificationsService.logWhatsAppLink(notifyOrder);
+
+    return savedOrder;
   }
 
   async findById(id: string): Promise<Order> {

@@ -1,8 +1,10 @@
+﻿// (c) C.Kurtoglu - Siparim Platform - Bu dosya Caglayan KURTOGLU tarafindan yapilmistir. Yetkisiz kopyalama yasaktir.
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { restaurantsApi } from '@/lib/api';
+import toast from 'react-hot-toast';
 
 const STATS = [
   { label: 'Bugünün Siparişleri', value: '23', icon: '🛒', color: 'text-blue-600', bg: 'bg-blue-50' },
@@ -28,7 +30,40 @@ const STATUS_LABELS: Record<string, { label: string; color: string }> = {
 };
 
 export default function RestaurantDashboardPage() {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
+  const [restaurantId, setRestaurantId] = useState<string | null>(null);
+  const [toggling, setToggling] = useState(false);
+
+  useEffect(() => {
+    restaurantsApi.getDashboard()
+      .then((res) => {
+        const r = res.data?.restaurant ?? res.data;
+        if (r) {
+          setRestaurantId(r.id);
+          setIsOpen(r.isOpen ?? false);
+        }
+      })
+      .catch(() => {
+        // Dashboard not available, continue with local state
+      });
+  }, []);
+
+  const handleToggle = async () => {
+    if (!restaurantId) {
+      setIsOpen(!isOpen);
+      return;
+    }
+    setToggling(true);
+    try {
+      await restaurantsApi.update(restaurantId, { isOpen: !isOpen });
+      setIsOpen(!isOpen);
+      toast.success(isOpen ? 'Restoran kapatıldı.' : 'Restoran açıldı!');
+    } catch {
+      toast.error('Durum güncellenemedi.');
+    } finally {
+      setToggling(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -41,8 +76,9 @@ export default function RestaurantDashboardPage() {
           </p>
         </div>
         <button
-          onClick={() => setIsOpen(!isOpen)}
-          className={`relative w-14 h-7 rounded-full transition-colors duration-300 ${isOpen ? 'bg-green-500' : 'bg-gray-300'}`}
+          onClick={handleToggle}
+          disabled={toggling}
+          className={`relative w-14 h-7 rounded-full transition-colors duration-300 disabled:opacity-60 ${isOpen ? 'bg-green-500' : 'bg-gray-300'}`}
         >
           <span className={`absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow transition-transform duration-300 ${isOpen ? 'translate-x-7' : 'translate-x-0'}`} />
         </button>

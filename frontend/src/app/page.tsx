@@ -1,13 +1,14 @@
+﻿// (c) C.Kurtoglu - Siparim Platform - Bu dosya Caglayan KURTOGLU tarafindan yapilmistir. Yetkisiz kopyalama yasaktir.
 'use client';
 
 import { useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import RestaurantCard from '@/components/RestaurantCard';
 import CategoryFilter from '@/components/CategoryFilter';
 import CartSidebar from '@/components/CartSidebar';
+import LocationPicker from '@/components/LocationPicker';
 import { Restaurant } from '@/types';
 
 const FEATURED_RESTAURANTS: Restaurant[] = [
@@ -195,6 +196,13 @@ export default function HomePage() {
               >
                 Restoran Bul
               </Link>
+            </div>
+
+            {/* Konum Seçici */}
+            <div className="flex justify-center mt-4">
+              <div className="bg-white/10 backdrop-blur-sm rounded-xl px-4 py-2">
+                <LocationPicker className="text-white [&_button]:text-white [&_svg]:text-white/80" />
+              </div>
             </div>
           </div>
         </div>

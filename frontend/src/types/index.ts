@@ -1,8 +1,11 @@
+﻿// (c) C.Kurtoglu - Siparim Platform - Bu dosya Caglayan KURTOGLU tarafindan yapilmistir. Yetkisiz kopyalama yasaktir.
 export type UserRole = 'customer' | 'restaurant_owner' | 'courier' | 'admin';
 
 export interface User {
   id: string;
-  name: string;
+  name?: string;          // computed: firstName + lastName
+  firstName?: string;
+  lastName?: string;
   email: string;
   phone?: string;
   role: UserRole;

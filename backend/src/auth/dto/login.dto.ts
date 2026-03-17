@@ -1,8 +1,8 @@
-import { IsEmail, IsString } from 'class-validator';
+import { IsString } from 'class-validator';
 
 export class LoginDto {
-  @IsEmail()
-  email: string;
+  @IsString()
+  email: string;  // e-posta veya kullanıcı adı
 
   @IsString()
   password: string;

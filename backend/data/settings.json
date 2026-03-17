@@ -1,0 +1,13 @@
+{
+  "courierServiceEnabled": true,
+  "maintenanceMode": false,
+  "supportPhone": "+905551234567",
+  "supportWhatsappEnabled": true,
+  "supportWhatsappMessage": "Merhaba! Siparim hakkında yardım almak istiyorum.",
+  "paymentSettings": {
+    "provider": "iyzico",
+    "testMode": true,
+    "apiKey": "",
+    "secretKey": ""
+  }
+}

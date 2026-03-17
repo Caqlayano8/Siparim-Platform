@@ -1,12 +1,13 @@
+﻿// (c) C.Kurtoglu - Siparim Platform - Bu dosya Caglayan KURTOGLU tarafindan yapilmistir. Yetkisiz kopyalama yasaktir.
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { useCartStore } from '@/store/cartStore';
 import { useAuthStore } from '@/store/authStore';
+import LocationPicker from './LocationPicker';
 
 interface NavbarProps {
   onCartClick?: () => void;
@@ -16,8 +17,11 @@ export default function Navbar({ onCartClick }: NavbarProps) {
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [mounted, setMounted] = useState(false);
   const itemCount = useCartStore((s) => s.itemCount());
   const { user, logout, isAuthenticated } = useAuthStore();
+
+  useEffect(() => setMounted(true), []);
 
   const handleLogout = () => {
     logout();
@@ -39,8 +43,13 @@ export default function Navbar({ onCartClick }: NavbarProps) {
         <div className="flex items-center justify-between h-16 gap-4">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 flex-shrink-0">
-            <Image src="/logo.svg" alt="Siparim" width={120} height={32} priority />
+            <h1 className="text-2xl font-black text-primary">Sipari<span className="text-orange-500">m</span></h1>
           </Link>
+
+          {/* Konum Seçici */}
+          <div className="hidden md:block">
+            <LocationPicker />
+          </div>
 
           {/* Search */}
           <form onSubmit={handleSearch} className="flex-1 max-w-md hidden md:block">
@@ -77,17 +86,22 @@ export default function Navbar({ onCartClick }: NavbarProps) {
             </button>
 
             {/* User menu */}
-            {isAuthenticated() ? (
+            {!mounted ? (
+              <div className="flex items-center gap-2">
+                <div className="w-16 h-8 bg-gray-100 rounded-xl animate-pulse" />
+                <div className="w-20 h-8 bg-gray-100 rounded-xl animate-pulse hidden md:block" />
+              </div>
+            ) : isAuthenticated() ? (
               <div className="relative">
                 <button
                   onClick={() => setMenuOpen(!menuOpen)}
                   className="flex items-center gap-2 p-2 rounded-xl hover:bg-gray-100 transition-colors"
                 >
                   <div className="w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center font-bold text-sm">
-                    {user?.name?.charAt(0).toUpperCase()}
+                    {(user?.name || user?.firstName || user?.email || '?').charAt(0).toUpperCase()}
                   </div>
                   <span className="hidden md:block text-sm font-medium text-gray-700 max-w-[100px] truncate">
-                    {user?.name}
+                    {user?.name || `${user?.firstName || ''} ${user?.lastName || ''}`.trim() || user?.email}
                   </span>
                   <svg className={`w-4 h-4 text-gray-500 transition-transform ${menuOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -97,7 +111,7 @@ export default function Navbar({ onCartClick }: NavbarProps) {
                 {menuOpen && (
                   <div className="absolute right-0 top-full mt-2 w-52 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 animate-fade-in z-50">
                     <div className="px-4 py-2 border-b border-gray-100 mb-1">
-                      <p className="font-semibold text-sm text-gray-800">{user?.name}</p>
+                      <p className="font-semibold text-sm text-gray-800">{user?.name || `${user?.firstName || ''} ${user?.lastName || ''}`.trim()}</p>
                       <p className="text-xs text-gray-400 truncate">{user?.email}</p>
                     </div>
                     <Link href="/profile" onClick={() => setMenuOpen(false)} className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">

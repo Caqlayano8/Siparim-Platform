@@ -1,6 +1,8 @@
+﻿// (c) C.Kurtoglu - Siparim Platform - Bu dosya Caglayan KURTOGLU tarafindan yapilmistir. Yetkisiz kopyalama yasaktir.
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { Toaster } from 'react-hot-toast';
+import ClientProviders from '@/components/ClientProviders';
 import './globals.css';
 
 const inter = Inter({
@@ -28,7 +30,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="tr" className={inter.variable}>
       <body className="bg-gray-50 text-gray-900 antialiased">
-        {children}
+        <ClientProviders>
+          {children}
+        </ClientProviders>
         <Toaster
           position="top-right"
           toastOptions={{

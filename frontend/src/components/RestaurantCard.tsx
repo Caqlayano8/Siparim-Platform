@@ -1,5 +1,5 @@
+﻿// (c) C.Kurtoglu - Siparim Platform - Bu dosya Caglayan KURTOGLU tarafindan yapilmistir. Yetkisiz kopyalama yasaktir.
 import Link from 'next/link';
-import Image from 'next/image';
 import { Restaurant } from '@/types';
 
 interface RestaurantCardProps {
@@ -12,11 +12,11 @@ export default function RestaurantCard({ restaurant }: RestaurantCardProps) {
       {/* Cover image */}
       <div className="relative h-44 bg-gray-100 overflow-hidden">
         {restaurant.coverImage ? (
-          <Image
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
             src={restaurant.coverImage}
             alt={restaurant.name}
-            fill
-            className="object-cover group-hover:scale-105 transition-transform duration-300"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-5xl bg-gradient-to-br from-primary-light to-orange-light">
@@ -69,7 +69,8 @@ export default function RestaurantCard({ restaurant }: RestaurantCardProps) {
           <div className="flex items-center gap-2 min-w-0">
             {restaurant.logo && (
               <div className="relative w-10 h-10 rounded-xl overflow-hidden flex-shrink-0 border border-gray-100">
-                <Image src={restaurant.logo} alt={restaurant.name} fill className="object-cover" />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={restaurant.logo} alt={restaurant.name} className="w-full h-full object-cover" />
               </div>
             )}
             <div className="min-w-0">
