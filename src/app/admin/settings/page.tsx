@@ -10,7 +10,7 @@ const LS_KEY = 'siparim_admin_settings';
 const DEFAULT_SETTINGS: Record<string, any> = {
   courierServiceEnabled: true,
   maintenanceMode: false,
-  supportPhone: '+905458966096',
+  supportPhone: '+05478966096',
   supportWhatsappEnabled: true,
   supportWhatsappMessage: 'Merhaba! Siparim hakkında yardım almak istiyorum.',
 };
